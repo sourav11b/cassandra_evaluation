@@ -1,0 +1,134 @@
+Sourav -
+
+The purpose of this exercise is to gauge how well a potential team member understands the concepts and concrete practices necessary to help customers build successful applications using DataStax Enterprise.  This exercise will also provide you with a DataStax Enterprise user experience. Note that I will be unable to assist you.  There are a wealth of educational and troubleshooting resources available.  
+
+ 
+
+The exercise consists of 5 required steps and one of two additional steps.  
+
+ 
+
+Required:
+
+Installation and Configuration of DataStax Enterprise (DSE MAX)
+
+Data model creation
+
+Importing of data into DSE Core, the Cassandra component of DataStax Enterprise
+
+Querying of data through Cassandra
+
+
+Choose one of the following:
+
+DataStax Search (SOLR)
+
+Search Node Configuration
+
+Search Index Creation
+
+Query through Search
+
+DataStax Analytics (Spark)
+
+Analytics Node Configuration
+
+Query through Analytics
+
+ 
+
+Prerequisites
+
+DataStax Enterprise Software Installation - (requires registration)
+
+You can download the Mac or Linux version of DataStax Enterprise or a Virtual Machine (Sandbox) from this page which should be suitable for this exercise.  Alternatively, you could create an installation on a cloud provider (at your expense).  Open-Source Cassandra lacks the functionality to complete this exercise so be sure to use DataStax Enterprise.  After this step, you should have a single-node cluster.  For bonus points, create a multiple-node cluster on real/virtual machines.
+
+
+Reference Materials
+
+Documentation – http://docs.datastax.com/en/index.html
+
+DataStax Academy - https://academy.datastax.com
+
+
+Source Data
+
+https://drive.google.com/file/d/0B69N0VMZjgO0aXFsQnJyZjRDZ2c/view?usp=sharing
+
+Only the flights_from_pg.csv is required for this exercise
+
+ 
+
+Exercise Steps
+
+Please execute each of the following steps.  Be prepared to share how each step was accomplished as well as observations.  Screenshots of the results and environment are best. Assemble this into a report that is of the quality you would feel comfortable putting in front of a customer.
+
+Download and start at least a one node cluster using DataStax Enterprise.
+
+Be sure to start the node(s) as either Search or Analytics node(s).
+
+Create the base data model using the following table definition.
+
+
+CREATE TABLE flights (
+
+        	  	ID int PRIMARY KEY,
+
+        	  	YEAR int,      	  	
+
+        	  	DAY_OF_MONTH int,
+
+        	  	FL_DATE timestamp,
+
+        	  	AIRLINE_ID int,
+
+        	  	CARRIER varchar,
+
+        	  	FL_NUM int,
+
+        	  	ORIGIN_AIRPORT_ID int,
+
+        	  	ORIGIN varchar,
+
+        	  	ORIGIN_CITY_NAME varchar,
+
+        	  	ORIGIN_STATE_ABR varchar,
+
+        	  	DEST varchar,
+
+        	  	DEST_CITY_NAME varchar,
+
+        	  	DEST_STATE_ABR varchar,
+
+        	  	DEP_TIME timestamp,
+
+        	  	ARR_TIME timestamp,
+
+        	  	ACTUAL_ELAPSED_TIME timestamp,
+
+        	  	AIR_TIME timestamp,
+
+        	  	DISTANCE int)
+
+Write a program to load the source data from the flights_from_pg.csv file into the flights table.
+
+How many records loaded?
+
+Were any errors returned during data loading?
+
+Please provide your code.
+
+Create and populate a Cassandra table designed to list all flights leaving a particular airport, sorted by time. 
+
+Create and populate a Cassandra table designed to provide the carrier, origin, and destination airport for a flight based on 10 minute buckets of air_time.
+
+
+Answer the following queries using either Search or Analytics.
+
+How many flights originated from the ‘HNL’ airport code on 2012-01-25
+
+How many airport codes start with the letter ‘A’
+
+What originating airport had the most flights on 2012-01-23
+
+Bonus – make a batch update to all records with a ‘BOS’ airport code using Spark and change the airport code to ‘TST’

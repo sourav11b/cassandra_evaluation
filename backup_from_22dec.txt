@@ -1,0 +1,181 @@
+cluster_name: 'Test Multi Cluste
+
+/data/commitlog
+/home/datastax/multi-node/node1/data/datafile
+/home/datastax/multi-node/node1/data/savedcache
+
+
+
+    <property name="cassandra.logdir" value="/home/datastax/multi-node/node1/logs/" />
+	
+	
+	    $ export DSE_HOME=/home/datastax/multi-node/dse-5.1.5
+		
+		NODE=/home/datastax/multi-node/node1;
+
+./with-dse-env.sh node2 bin/dse cassandra -f
+
+./with-dse-env.sh node1 bin/dse cassandra -f
+
+./with-dse-env.sh node3 bin/dse cassandra -f -s
+
+
+
+		
+		export DSE_HOME=/home/datastax/multi-node/dse-5.1.5
+Since we're configuring a homogeneous cluster of nodes running only Apache Cassandra™ workloads, set only the configuration environment variables that are relevant for this workload to point to the files on each node's configuration directory,
+
+ for NODE=/home/datastax/multi-node/node2:
+
+    $ export DSE_CONF=$NODE/resources/dse/conf; export CASSANDRA_HOME=$NODE/resources/cassandra;export CASSANDRA_CONF=$CASSANDRA_HOME/conf
+    $ export CASSANDRA_HOME=$NODE/resources/cassandra
+    $ export CASSANDRA_CONF=$CASSANDRA_HOME/conf
+The remaining environment variables can be set to the default configuration files:
+
+    $ export TOMCAT_HOME=$DSE_HOME/resources/tomcat
+    $ export TOMCAT_CONF_DIR=$TOMCAT_HOME/conf
+    $ export HADOOP_CONF_DIR=$DSE_HOME/resources/hadoop/conf
+    $ export HADOOP_HOME=$DSE_HOME/resources/hadoop
+    $ export HIVE_CONF_DIR=$DSE_HOME/resources/hive/conf
+    $ export SPARK_CONF_DIR=$DSE_HOME/resources/spark/conf
+	
+	
+	https://www.datastax.com/dev/blog/troubleshooting-datastax-enterprise
+	
+	https://www.datastax.com/dev/blog/running-multiple-datastax-enterprise-nodes-in-a-single-host
+	
+	
+	./with-dse-env.sh node1 bin/dsetool ring
+	
+	
+	----
+	
+	
+[datastax@localhost multi-node]$ ./with-dse-env.sh node1 bin/dsetool ring
+Server ID          Address          DC                   Rack         Workload             Graph  Status  State    Load             Owns                 Token                                        Health [0,1] 
+                                                                                                                                                         7332367178049914863                                       
+                   127.0.0.3        Solr                 rack1        Search               no     Up      Normal   301.28 KiB       ?                    -6678336291071652376                         0.30         
+                   127.0.0.2        Cassandra            rack1        Cassandra            no     Up      Normal   172.52 KiB       ?                    2992615681252326851                          0.30         
+                   127.0.0.1        Cassandra            rack1        Cassandra            no     Up      Normal   165.25 KiB       ?                    7332367178049914863                          0.30         
+Note: you must specify a keyspace to get ownership informa
+
+cd /home/datastax/multi-node/dse-5.1.5/bin/
+
+cqslsh 127.0.0.3
+
+CREATE TABLE flights (
+
+        	  	ID int PRIMARY KEY,
+
+        	  	YEAR int,      	  	
+
+        	  	DAY_OF_MONTH int,
+
+        	  	FL_DATE timestamp,
+
+        	  	AIRLINE_ID int,
+
+        	  	CARRIER varchar,
+
+        	  	FL_NUM int,
+
+        	  	ORIGIN_AIRPORT_ID int,
+
+        	  	ORIGIN varchar,
+
+        	  	ORIGIN_CITY_NAME varchar,
+
+        	  	ORIGIN_STATE_ABR varchar,
+
+        	  	DEST varchar,
+
+        	  	DEST_CITY_NAME varchar,
+
+        	  	DEST_STATE_ABR varchar,
+
+        	  	DEP_TIME time,
+
+        	  	ARR_TIME time,
+
+        	  	ACTUAL_ELAPSED_TIME int,
+
+        	  	AIR_TIME int,
+
+        	  	DISTANCE int)
+				
+	use test keyspace			use test
+	
+	SOURCE '/home/datastax/multi-node/cql_scripts/create.cql'
+	
+		SOURCE '/home/datastax/multi-node/cql_scripts/create_flights_temp.cql'
+
+	
+	cqlsh:test> SOURCE '/home/datastax/multi-node/cql_scripts/create.cql'
+/home/datastax/multi-node/cql_scripts/create.cql:4:OperationTimedOut: errors={'127.0.0.3': 'Request timed out while waiting for schema agreement. See Session.execute[_async](timeout) and Cluster.max_schema_agreement_wait.'}, last_host=127.0.0.3
+/home/datast
+
+/home/datastax/multi-node/sample data/flights
+
+copy flights (ID,YEAR,FL_DATE,AIRLINE_ID,CARRIER,FL_NUM,ORIGIN_AIRPORT_ID,ORIGIN,ORIGIN_CITY_NAME,ORIGIN_STATE_ABR,DEST,DEST_CITY_NAME,DEST_STATE_ABR,DEP_TIME,ARR_TIME,ACTUAL_ELAPSED_TIME,AIR_TIME,DISTANCE) from '/home/datastax/multi-node/sample data/flights/flights_from_pg.csv';
+
+
+3,2012,1,11/11/2012,19805,AA,1,12478,JFK,New York, NY,LAX,Los Angeles, CA,855,1142,347,330,2475
+
+
+Processed: 1048576 rows; Rate:   15088 rows/s; Avg. rate:   33632 rows/s
+1048576 rows imported from 1 files in 31.178 seconds (0 skipped).
+
+
+Failed to import 5000 rows: ParseError - Invalid row length 19 should be 18,  given up without retries
+Failed to import 5000 rows: ParseError - Invalid row length 19 should be 18,  given up without retries
+Failed to import 3576 rows: ParseError - Invalid row length 19 should be 18,  given up without retries
+Failed to process 1048576 rows; failed rows written to import_test_flights.err
+
+
+SOURCE '/home/datastax/multi-node/cql_scripts/create.cql'
+
+
+copy flights (ID,YEAR,FL_DATE,AIRLINE_ID,CARRIER,FL_NUM,ORIGIN_AIRPORT_ID,ORIGIN,ORIGIN_CITY_NAME,ORIGIN_STATE_ABR,DEST,DEST_CITY_NAME,DEST_STATE_ABR,DEP_TIME,ARR_TIME,ACTUAL_ELAPSED_TIME,AIR_TIME,DISTANCE) from '/home/datastax/multi-node/sample data/flights/sample.csv';
+
+
+
+cd /home/datastax/multi-node/dse-5.1.5/resources/cassandra/bin;./sstableloader -d 127.0.0.1 /home/datastax/eclipse-workspace/cassandra-csv-upload/data/evaluation/flights_by_airport_time_ordered
+
+cd /home/datastax/multi-node/dse-5.1.5/resources/cassandra/bin;./sstableloader -d 127.0.0.1 /home/datastax/eclipse-workspace/cassandra-csv-upload/data/evaluation/flights
+
+
+ReadTimeout: Error from server: code=1200 [Coordinator node timed out waiting for replica nodes' responses] message="Operation timed out - received only 0 responses." info={'received_responses': 0, 'required_responses': 1, 'consistency': 'ONE'}
+
+progress: [/127.0.0.1]0:103/105 98 % total: 98% 1.577MiB/s (avg: 1.166MiB/s)
+progress: [/127.0.0.1]0:104/105 99 % total: 99% 2.028MiB/s (avg: 1.171MiB/s)
+progress: [/127.0.0.1]0:105/105 100% total: 100% 1.521MiB/s (avg: 1.173MiB/s)
+progress: [/127.0.0.1]0:105/105 100% total: 100% 0.000KiB/s (avg: 1.127MiB/s)
+
+Summary statistics: 
+   Connections per host    : 1         
+   Total files transferred : 105       
+   Total bytes transferred : 53.953MiB 
+   Total duration          : 47857 ms  
+   Average transfer rate   : 1.127MiB/s
+   Peak transfer rate      : 1.173MiB/s
+
+   
+   ReadTimeout: Error from server: code=1200 [Coordinator node timed out waiting for replica nodes' responses] message="Operation timed out - received only 0 responses." info={'received_responses': 0, 'required_responses': 1, 'consistency': 'ONE'}
+
+   
+   
+   COPY evaluation.flights to '/home/datastax/temp/data.csv' with NUMPROCESSES=16;
+Using 16 child processes
+
+Starting copy of evaluation.flights with columns [id, actual_elapsed_time, air_time, airline_id, arr_time, carrier, day_of_month, dep_time, dest, dest_city_name, dest_state_abr, distance, fl_date, fl_num, origin, origin_airport_id, origin_city_name, origin_state_abr, year].
+
+
+cqlsh> COPY evaluation.flights to '/home/datastax/temp/data.csv' with NUMPROCESSES=16;
+Using 16 child processes
+
+Starting copy of evaluation.flights with columns [id, actual_elapsed_time, air_time, airline_id, arr_time, carrier, day_of_month, dep_time, dest, dest_city_name, dest_state_abr, distance, fl_date, fl_num, origin, origin_airport_id, origin_city_name, origin_state_abr, year].
+Processed: 1048576 rows; Rate:     796 rows/s; Avg. rate:    1277 rows/s
+1048576 rows exported to 1 files in 13 minutes and 41.219 seconds.
+
+
+ dsetool create_core evaluation.flights_temp generateResources=true

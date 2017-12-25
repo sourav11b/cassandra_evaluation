@@ -1,0 +1,83 @@
+
+import org.apache.spark.sql.SaveMode
+var rows_containing_bos = spark.read.format("org.apache.spark.sql.cassandra")
+  .options(Map( "table" -> "flights", "keyspace" -> "evaluation"))
+  .load()
+  .filter("origin='BOS' or dest='BOS'")  
+  
+rows_containing_bos.write.format("org.apache.spark.sql.cassandra")
+  .options(Map( "table" -> "flights_temp", "keyspace" -> "evaluation"))
+  .mode(SaveMode.Append).save()
+
+
+  
+  
+import com.datastax.spark.connector.writer._
+
+sc.cassandraTable("evaluation", "flights")
+  .where("dest='BOS'")
+  .deleteFromCassandra("evaluation", "flights") 
+  
+sc.cassandraTable("evaluation", "flights")
+  .where("origin='BOS'")
+  .deleteFromCassandra("evaluation", "flights")
+
+println("deleted data")
+ 
+ 
+ 
+var temp_tab  = spark.read.format("org.apache.spark.sql.cassandra")
+  .options(Map( "table" -> "flights_temp", "keyspace" -> "evaluation"))
+  .load() 
+import org.apache.spark.sql.types._
+
+val stringColumns = temp_tab.schema.fields.collect{
+  case StructField(name, StringType, _, _) => name
+}
+
+val removeXX = udf( (s: String) =>     
+  if (s == null) null else s.replaceAll("BOS", "TST")
+)
+
+val dfResult = stringColumns.foldLeft( temp_tab )( (acc, c) =>
+  acc.withColumn( c, removeXX(temp_tab(c)) )
+)  
+  
+println("number of modified results :"+dfResult.count())
+
+dfResult.write.format("org.apache.spark.sql.cassandra")
+  .options(Map( "table" -> "flights", "keyspace" -> "evaluation"))
+  .mode(SaveMode.Append)
+  .save()
+  
+  
+println("done")
+  
+  
+  
+  
+  all_rows  = spark.read.format("org.apache.spark.sql.cassandra")
+  .options(Map( "table" -> "flights", "keyspace" -> "evaluation"))
+  .load()
+println("------------------------"+all_rows.count())
+
+
+
+----------------
+
+val collection = sc.parallelize(Seq((30, "cat"), (40, "fox")))
+collection.saveToCassandra("test", "words", SomeColumns("word" as "_2", "count" as "_1"))
+import com.datastax.spark.connector._ 
+case class WordCount(word: String, count: Long)
+val collection = sc.parallelize(Seq(WordCount("dog", 50), WordCount("cow", 60)))
+collection.saveToCassandra("test", "words", SomeColumns("word", "count"))
+
+sc.cassandraTable("evaluation", "flights")
+  .where("origin='BOS'").limit(1)
+  .deleteFromCassandra("evaluation", "flights")
+
+  ALTER KEYSPACE "evaluation" WITH REPLICATION =
+  { 'class' : 'SimpleStrategy', 'replication_factor' : 1 };
+  
+  nodetool repair --full evaluation
+  
