@@ -1,0 +1,29 @@
+ sc.cassandraTable("evaluation","flights")
+  .where("origin = 'HNL' AND fl_date = '2012-01-25'").cassandraCount
+  
+  val date = "2012-01-23";
+  val query = "fl_date = '"+date+"'"
+  val res = sc.cassandraTable("evaluation","flights")
+  .where(query)
+  .select("origin","id")
+  .as((a:String, y:Int) => ((a),y))
+  .groupByKey
+  .map(e => (e._1,e._2.toList))
+  .map(e => (e._1,e._2.size)).collectAsMap().toSeq.sortWith(_._2 > _._2).take(1).map(e => e._1)
+
+  println("What originating airport had the most flights on "+date+" --> " +res.mkString(" "))
+  
+  sc.cassandraTable("evaluation","flights")
+  .where("fl_date = '2012-01-23'").map(row => (row.getString("origin"),1)).countByKey().collect().foreach(println)
+  
+  SELECT count(*) FROM evaluation.flights WHERE solr_query = 'fl_date:1972-05-20T17:33:18.772Z';
+
+  
+   302602 | 1970-01-01 08:01:00.000000+0000 | 1970-01-01 07:49:00.000000+0000 |      20304 | 1970-01-01 22:53:00.000000+0000 |      OO |           20 | 1970-01-01 21:52:00.000000+0000 |  SLC | Salt Lake City |             UT |      162 | 2012-01-20 07:00:00.000000+0000 |   7776 |    RKS |             14543 |     Rock Springs |               WY |       null | 2012
+
+   
+   curl -X POST -H 'Content-type:application/json' --data-binary '{ "replace-field":{   "name":"fl_date", "type":"date","stored":true, "docValues" : true }}' http://localhost:8983/solr/evaluation.flights/schema
+   
+ http://localhost:8983/solr/evaluation.flights/select?q=origin%3AA*+OR++dest%3AA*&json.facet={%20%20x%20:%20%22unique%28origin%29%22%20%20%20%20}&useFieldCache=true&rows=0
+ 
+ http://yonik.com/solr-count-distinct/
